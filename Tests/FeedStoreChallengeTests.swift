@@ -12,7 +12,11 @@ class RealmFeedStore: FeedStore {
     }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-        
+//        do {
+//            let realm = try Realm()
+//        } catch {
+//            completion(error)
+//        }
     }
     
     func retrieve(completion: @escaping RetrievalCompletion) {
