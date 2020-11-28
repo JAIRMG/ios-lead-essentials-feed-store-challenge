@@ -80,21 +80,12 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     
     override func setUp() {
         super.setUp()
-        
-        let realm = try! Realm()
-        try! realm.write {
-            realm.deleteAll()
-        }
-        
+        setupEmptyState()
     }
     
     override func tearDown() {
         super.tearDown()
-        
-        let realm = try! Realm()
-        try! realm.write {
-            realm.deleteAll()
-        }
+        undoStoreFeedSideEffects()
     }
 
 	func test_retrieve_deliversEmptyOnEmptyCache() {
@@ -175,6 +166,20 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 		return RealmFeedStore()
 	}
 	
+    private func undoStoreFeedSideEffects() {
+        deleteArtifacts()
+    }
+    
+    private func setupEmptyState() {
+        deleteArtifacts()
+    }
+    
+    private func deleteArtifacts() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.deleteAll()
+        }
+    }
 }
 
 //  ***********************
