@@ -4,6 +4,44 @@
 
 import XCTest
 import FeedStoreChallenge
+import RealmSwift
+
+class Cache: Object {
+    var feed = List<RealmFeedImage>()
+    @objc dynamic var timestamp = Date()
+    
+    var localFeed: [LocalFeedImage] {
+        feed.map { $0.local }
+    }
+    
+}
+
+class RealmFeedImage: Object {
+    @objc dynamic var id = ""
+    @objc dynamic var cacheDescription = ""
+    @objc dynamic var location = ""
+    @objc dynamic var url = ""
+
+    override static func primaryKey() -> String? {
+      "id"
+    }
+    
+    convenience init(_ image: LocalFeedImage) {
+        self.init()
+        self.id = "\(image.id)"
+        self.cacheDescription = image.description ?? ""
+        self.location = image.location ?? ""
+        self.url = "\(url)"
+    }
+    
+    var local: LocalFeedImage {
+        .init(id: UUID(uuidString: id) ?? UUID.init(),
+              description: cacheDescription,
+              location: location,
+              url: URL(string: url) ?? URL(string: "http://any-url.com")!)
+    }
+    
+}
 
 class RealmFeedStore: FeedStore {
     
@@ -12,33 +50,52 @@ class RealmFeedStore: FeedStore {
     }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-//        do {
-//            let realm = try Realm()
-//        } catch {
-//            completion(error)
-//        }
+        let realm = try! Realm()
+        print(realm.configuration.fileURL!)
+        let cache = Cache()
+        let feedList = feed.map(RealmFeedImage.init)
+        cache.feed.append(objectsIn: feedList)
+        cache.timestamp = timestamp
+        
+        try! realm.write {
+            realm.add(cache)
+        }
+ 
+        completion(nil)
     }
     
     func retrieve(completion: @escaping RetrievalCompletion) {
-        completion(.empty)
+        let realm = try! Realm()
+        guard let cache = realm.objects(Cache.self).first else {
+            return completion(.empty)
+        }
+        
+        completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
     }
     
     
 }
 
 class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
-	
-    //  ***********************
-    //
-    //  Follow the TDD process:
-    //
-    //  1. Uncomment and run one test at a time (run tests with CMD+U).
-    //  2. Do the minimum to make the test pass and commit.
-    //  3. Refactor if needed and commit again.
-    //
-    //  Repeat this process until all tests are passing.
-    //
-    //  ***********************
+    
+    override func setUp() {
+        super.setUp()
+        
+        let realm = try! Realm()
+        try! realm.write {
+            realm.deleteAll()
+        }
+        
+    }
+    
+    override func tearDown() {
+        super.tearDown()
+        
+        let realm = try! Realm()
+        try! realm.write {
+            realm.deleteAll()
+        }
+    }
 
 	func test_retrieve_deliversEmptyOnEmptyCache() {
 		let sut = makeSUT()
@@ -53,9 +110,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 
 	func test_retrieve_deliversFoundValuesOnNonEmptyCache() {
-//		let sut = makeSUT()
-//
-//		assertThatRetrieveDeliversFoundValuesOnNonEmptyCache(on: sut)
+		let sut = makeSUT()
+
+		assertThatRetrieveDeliversFoundValuesOnNonEmptyCache(on: sut)
 	}
 
 	func test_retrieve_hasNoSideEffectsOnNonEmptyCache() {
