@@ -19,6 +19,9 @@
 		08CE2BB32285BCE700183A1B /* XCTestCase+FailableInsertFeedStoreSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08CE2BAE2285BCE700183A1B /* XCTestCase+FailableInsertFeedStoreSpecs.swift */; };
 		08CE2BB52285BEF100183A1B /* FeedStoreChallengeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08CE2BB42285BEF100183A1B /* FeedStoreChallengeTests.swift */; };
 		171A457278B3A431E6F58B88 /* Pods_FeedStoreChallenge_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E985CA45D53F3820CFEA1146 /* Pods_FeedStoreChallenge_Tests.framework */; };
+		A1479E692574531800D26ADB /* RealmFeedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1479E682574531800D26ADB /* RealmFeedStore.swift */; };
+		A1479E6E2574540300D26ADB /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1479E6D2574540300D26ADB /* Cache.swift */; };
+		A1479E742574542C00D26ADB /* RealmFeedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1479E732574542C00D26ADB /* RealmFeedImage.swift */; };
 		F09666277FBB5C714CE42B91 /* Pods_FeedStoreChallenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D841688117406375E1021D /* Pods_FeedStoreChallenge.framework */; };
 /* End PBXBuildFile section */
 
@@ -52,6 +55,9 @@
 		6C97FA6F6F2F0AA1D077634B /* Pods-FeedStoreChallenge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FeedStoreChallenge.debug.xcconfig"; path = "Target Support Files/Pods-FeedStoreChallenge/Pods-FeedStoreChallenge.debug.xcconfig"; sourceTree = "<group>"; };
 		86D841688117406375E1021D /* Pods_FeedStoreChallenge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FeedStoreChallenge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1203B143E99798E70A2D825 /* Pods-FeedStoreChallenge-Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FeedStoreChallenge-Tests.debug.xcconfig"; path = "Target Support Files/Pods-FeedStoreChallenge-Tests/Pods-FeedStoreChallenge-Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		A1479E682574531800D26ADB /* RealmFeedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmFeedStore.swift; sourceTree = "<group>"; };
+		A1479E6D2574540300D26ADB /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
+		A1479E732574542C00D26ADB /* RealmFeedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmFeedImage.swift; sourceTree = "<group>"; };
 		E985CA45D53F3820CFEA1146 /* Pods_FeedStoreChallenge_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FeedStoreChallenge_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -99,6 +105,7 @@
 		08CE2B8D2285BBD100183A1B /* FeedStoreChallenge */ = {
 			isa = PBXGroup;
 			children = (
+				A1479E6C257453E400D26ADB /* RealmFeedStore */,
 				08CE2BA72285BCC600183A1B /* LocalFeedImage.swift */,
 				08CE2BA52285BCB600183A1B /* FeedStore.swift */,
 				08CE2B8F2285BBD100183A1B /* Info.plist */,
@@ -148,6 +155,16 @@
 				E985CA45D53F3820CFEA1146 /* Pods_FeedStoreChallenge_Tests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A1479E6C257453E400D26ADB /* RealmFeedStore */ = {
+			isa = PBXGroup;
+			children = (
+				A1479E682574531800D26ADB /* RealmFeedStore.swift */,
+				A1479E6D2574540300D26ADB /* Cache.swift */,
+				A1479E732574542C00D26ADB /* RealmFeedImage.swift */,
+			);
+			path = RealmFeedStore;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -328,6 +345,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				08CE2BA62285BCB600183A1B /* FeedStore.swift in Sources */,
+				A1479E692574531800D26ADB /* RealmFeedStore.swift in Sources */,
+				A1479E6E2574540300D26ADB /* Cache.swift in Sources */,
+				A1479E742574542C00D26ADB /* RealmFeedImage.swift in Sources */,
 				08CE2BA82285BCC600183A1B /* LocalFeedImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
