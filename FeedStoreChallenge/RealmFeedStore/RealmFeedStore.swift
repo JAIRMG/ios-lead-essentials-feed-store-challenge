@@ -13,10 +13,10 @@ public class RealmFeedStore: FeedStore {
     public init() { }
     
     private static let cacheId = "cache"
-    private let queue = DispatchQueue(label: "\(RealmFeedStore.self) queue", qos: .userInitiated)
+    private let queue = DispatchQueue(label: "\(RealmFeedStore.self) queue", qos: .userInitiated, attributes: .concurrent)
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-        queue.async {
+        queue.async(flags: .barrier) {
             let realm = try! Realm()
             
             guard let cache = realm.objects(Cache.self).first else {
@@ -35,7 +35,7 @@ public class RealmFeedStore: FeedStore {
     
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         let cacheId = RealmFeedStore.cacheId
-        queue.async { [weak self] in
+        queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             let realm = try! Realm()
             let feedList = feed.map(RealmFeedImage.init)
