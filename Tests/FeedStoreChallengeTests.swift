@@ -9,6 +9,11 @@ import RealmSwift
 class Cache: Object {
     var feed = List<RealmFeedImage>()
     @objc dynamic var timestamp = Date()
+    @objc dynamic var id = ""
+    override static func primaryKey() -> String? {
+      "id"
+    }
+    
     
     var localFeed: [LocalFeedImage] {
         feed.map { $0.local }
@@ -45,23 +50,54 @@ class RealmFeedImage: Object {
 
 class RealmFeedStore: FeedStore {
     
+    private let cacheId = "cache"
+    
     func deleteCachedFeed(completion: @escaping DeletionCompletion) {
         
     }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+        
+        
         let realm = try! Realm()
-        print(realm.configuration.fileURL!)
         let cache = Cache()
         let feedList = feed.map(RealmFeedImage.init)
-        cache.feed.append(objectsIn: feedList)
-        cache.timestamp = timestamp
         
-        try! realm.write {
-            realm.add(cache)
-        }
+        
+        let cacheExists = RealmFeedStore.objectExist(realm: realm, id: cacheId)
+
+          if cacheExists {
+            
+            try! realm.write {
+              // 3
+              realm.create(
+                Cache.self,
+                value: [
+                  "feed": feedList,
+                  "timestamp": timestamp,
+                  "id": "cache"
+                ],
+                update: .modified)
+            
+            }
+            
+          } else {
+            cache.feed.append(objectsIn: feedList)
+            cache.timestamp = timestamp
+            cache.id = "cache"
+            
+            try! realm.write {
+                realm.add(cache)
+            }
+            
+          }
+        
  
         completion(nil)
+    }
+    
+    static func objectExist (realm: Realm, id: String) -> Bool {
+        return realm.object(ofType: Cache.self, forPrimaryKey: id) != nil
     }
     
     func retrieve(completion: @escaping RetrievalCompletion) {
@@ -125,9 +161,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 
 	func test_insert_overridesPreviouslyInsertedCacheValues() {
-//		let sut = makeSUT()
-//
-//		assertThatInsertOverridesPreviouslyInsertedCacheValues(on: sut)
+		let sut = makeSUT()
+
+		assertThatInsertOverridesPreviouslyInsertedCacheValues(on: sut)
 	}
 
 	func test_delete_deliversNoErrorOnEmptyCache() {
