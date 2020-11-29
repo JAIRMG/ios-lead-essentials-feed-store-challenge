@@ -53,7 +53,20 @@ class RealmFeedStore: FeedStore {
     private let cacheId = "cache"
     
     func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-        completion(nil)
+        let realm = try! Realm()
+        
+        guard let cache = realm.objects(Cache.self).first else {
+            return completion(nil)
+        }
+        do {
+            try realm.write {
+              realm.delete(cache)
+            }
+            completion(nil)
+        } catch {
+            completion(error)
+        }
+
     }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
@@ -193,9 +206,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 
 	func test_delete_deliversNoErrorOnNonEmptyCache() {
-//		let sut = makeSUT()
-//
-//		assertThatDeleteDeliversNoErrorOnNonEmptyCache(on: sut)
+		let sut = makeSUT()
+
+		assertThatDeleteDeliversNoErrorOnNonEmptyCache(on: sut)
 	}
 
 	func test_delete_emptiesPreviouslyInsertedCache() {
