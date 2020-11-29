@@ -58,42 +58,56 @@ class RealmFeedStore: FeedStore {
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         
-        
         let realm = try! Realm()
-        let cache = Cache()
         let feedList = feed.map(RealmFeedImage.init)
-        
-        
         let cacheExists = RealmFeedStore.objectExist(realm: realm, id: cacheId)
 
-          if cacheExists {
-            
-            try! realm.write {
-              // 3
-              realm.create(
-                Cache.self,
-                value: [
-                  "feed": feedList,
-                  "timestamp": timestamp,
-                  "id": "cache"
-                ],
-                update: .modified)
-            
+        do {
+            if cacheExists {
+              
+              try updateCache(feedList, timestamp, cacheId, realm)
+
+            } else {
+              
+              try firstTimeInsertion(feedList, timestamp, cacheId, realm)
+              
             }
-            
-          } else {
-            cache.feed.append(objectsIn: feedList)
-            cache.timestamp = timestamp
-            cache.id = "cache"
-            
-            try! realm.write {
-                realm.add(cache)
-            }
-            
-          }
+            completion(nil)
+        } catch {
+            completion(error)
+        }
+
+    }
+    
+    private func firstTimeInsertion(_ feedList: [RealmFeedImage], _ timestamp: Date, _ id: String, _ realm: Realm) throws {
         
- 
-        completion(nil)
+        let localRealm: Realm = realm
+        
+        let cache = Cache()
+        cache.feed.append(objectsIn: feedList)
+        cache.timestamp = timestamp
+        cache.id = cacheId
+        
+        try localRealm.write {
+            realm.add(cache)
+        }
+    }
+    
+    private func updateCache(_ feedList: [RealmFeedImage], _ timestamp: Date, _ id: String, _ realm: Realm) throws {
+        
+        let localRealm: Realm = realm
+        
+        try localRealm.write {
+          realm.create(
+            Cache.self,
+            value: [
+              "feed": feedList,
+              "timestamp": timestamp,
+              "id": "\(cacheId)"
+            ],
+            update: .modified)
+        
+        }
     }
     
     static func objectExist (realm: Realm, id: String) -> Bool {
