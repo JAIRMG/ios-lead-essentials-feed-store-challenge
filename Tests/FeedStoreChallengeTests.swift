@@ -50,63 +50,66 @@ class RealmFeedImage: Object {
 
 class RealmFeedStore: FeedStore {
     
-    private let cacheId = "cache"
+    private static let cacheId = "cache"
+    private let queue = DispatchQueue(label: "\(RealmFeedStore.self) queue", qos: .userInitiated)
     
     func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-        let realm = try! Realm()
-        
-        guard let cache = realm.objects(Cache.self).first else {
-            return completion(nil)
-        }
-        do {
-            try realm.write {
-              realm.delete(cache)
+        queue.async {
+            let realm = try! Realm()
+            
+            guard let cache = realm.objects(Cache.self).first else {
+                return completion(nil)
             }
-            completion(nil)
-        } catch {
-            completion(error)
+            do {
+                try realm.write {
+                  realm.delete(cache)
+                }
+                completion(nil)
+            } catch {
+                completion(error)
+            }
         }
-
     }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-        
-        let realm = try! Realm()
-        let feedList = feed.map(RealmFeedImage.init)
-        let cacheExists = RealmFeedStore.objectExist(realm: realm, id: cacheId)
+        let cacheId = RealmFeedStore.cacheId
+        queue.async { [unowned self] in
+            let realm = try! Realm()
+            let feedList = feed.map(RealmFeedImage.init)
+            let cacheExists = RealmFeedStore.objectExist(realm: realm, id: cacheId)
 
-        do {
-            if cacheExists {
-              
-              try updateCache(feedList, timestamp, cacheId, realm)
+            do {
+                if cacheExists {
+                  
+                    try updateCache(feedList, timestamp, cacheId, realm)
 
-            } else {
-              
-              try firstTimeInsertion(feedList, timestamp, cacheId, realm)
-              
+                } else {
+                  
+                    try firstTimeInsertion(feedList, timestamp, cacheId, realm)
+                  
+                }
+                completion(nil)
+            } catch {
+                completion(error)
             }
-            completion(nil)
-        } catch {
-            completion(error)
         }
-
     }
     
-    private func firstTimeInsertion(_ feedList: [RealmFeedImage], _ timestamp: Date, _ id: String, _ realm: Realm) throws {
+    func firstTimeInsertion(_ feedList: [RealmFeedImage], _ timestamp: Date, _ id: String, _ realm: Realm) throws {
         
         let localRealm: Realm = realm
         
         let cache = Cache()
         cache.feed.append(objectsIn: feedList)
         cache.timestamp = timestamp
-        cache.id = cacheId
+        cache.id = RealmFeedStore.cacheId
         
         try localRealm.write {
             realm.add(cache)
         }
     }
     
-    private func updateCache(_ feedList: [RealmFeedImage], _ timestamp: Date, _ id: String, _ realm: Realm) throws {
+    func updateCache(_ feedList: [RealmFeedImage], _ timestamp: Date, _ id: String, _ realm: Realm) throws {
         
         let localRealm: Realm = realm
         
@@ -116,7 +119,7 @@ class RealmFeedStore: FeedStore {
             value: [
               "feed": feedList,
               "timestamp": timestamp,
-              "id": "\(cacheId)"
+                "id": "\(RealmFeedStore.cacheId)"
             ],
             update: .modified)
         
@@ -128,12 +131,14 @@ class RealmFeedStore: FeedStore {
     }
     
     func retrieve(completion: @escaping RetrievalCompletion) {
-        let realm = try! Realm()
-        guard let cache = realm.objects(Cache.self).first else {
-            return completion(.empty)
+        queue.async {
+            let realm = try! Realm()
+            guard let cache = realm.objects(Cache.self).first else {
+                return completion(.empty)
+            }
+            
+            completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
         }
-        
-        completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
     }
     
     
@@ -218,9 +223,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 
 	func test_storeSideEffects_runSerially() {
-//		let sut = makeSUT()
-//
-//		assertThatSideEffectsRunSerially(on: sut)
+		let sut = makeSUT()
+
+		assertThatSideEffectsRunSerially(on: sut)
 	}
 	
 	// - MARK: Helpers
