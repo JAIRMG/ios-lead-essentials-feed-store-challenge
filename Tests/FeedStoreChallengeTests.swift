@@ -73,7 +73,8 @@ class RealmFeedStore: FeedStore {
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         let cacheId = RealmFeedStore.cacheId
-        queue.async { [unowned self] in
+        queue.async { [weak self] in
+            guard let self = self else { return }
             let realm = try! Realm()
             let feedList = feed.map(RealmFeedImage.init)
             let cacheExists = RealmFeedStore.objectExist(realm: realm, id: cacheId)
@@ -81,11 +82,11 @@ class RealmFeedStore: FeedStore {
             do {
                 if cacheExists {
                   
-                    try updateCache(feedList, timestamp, cacheId, realm)
+                    try self.updateCache(feedList, timestamp, cacheId, realm)
 
                 } else {
                   
-                    try firstTimeInsertion(feedList, timestamp, cacheId, realm)
+                    try self.firstTimeInsertion(feedList, timestamp, cacheId, realm)
                   
                 }
                 completion(nil)
@@ -231,7 +232,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	// - MARK: Helpers
 	
 	private func makeSUT() -> FeedStore {
-		return RealmFeedStore()
+		let sut = RealmFeedStore()
+        trackForMemoryLeaks(instance: sut)
+        return sut
 	}
 	
     private func undoStoreFeedSideEffects() {
@@ -246,6 +249,12 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
         let realm = try! Realm()
         try! realm.write {
             realm.deleteAll()
+        }
+    }
+    
+    func trackForMemoryLeaks(instance: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
+        addTeardownBlock { [weak instance] in
+            XCTAssertNil(instance, "Instance should have been deallocated, potential memory leak", file: file, line: line)
         }
     }
 }
