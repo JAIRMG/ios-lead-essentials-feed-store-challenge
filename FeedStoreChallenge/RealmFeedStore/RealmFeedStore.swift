@@ -13,7 +13,6 @@ public class RealmFeedStore: FeedStore {
     public init() { }
     
     private static let cacheId = "cache"
-    private let queue = DispatchQueue(label: "\(RealmFeedStore.self) queue", qos: .userInitiated, attributes: .concurrent)
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
         let realm = try! Realm()
