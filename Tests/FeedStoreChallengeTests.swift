@@ -90,7 +90,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 		assertThatSideEffectsRunSerially(on: sut)
 	}
     
-    func test_sutCreation_throwErrorWithInvalidURL() throws {
+    func test_sutCreation_throwErrorWithInvalidURL() {
         var configuration = Realm.Configuration()
         configuration.fileURL = invalidURL()
 
