@@ -120,12 +120,6 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
         }
     }
     
-    private func trackForMemoryLeaks(instance: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
-        addTeardownBlock { [weak instance] in
-            XCTAssertNil(instance, "Instance should have been deallocated, potential memory leak", file: file, line: line)
-        }
-    }
-    
     private func invalidURL() -> URL {
         let invalidURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
         invalidURL.stopAccessingSecurityScopedResource()
