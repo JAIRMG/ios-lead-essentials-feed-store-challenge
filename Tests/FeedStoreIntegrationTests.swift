@@ -38,14 +38,14 @@ class FeedStoreIntegrationTests: XCTestCase {
     }
 
     func test_retrieve_deliversFeedInsertedOnAnotherInstance() {
-//        let storeToInsert = makeSUT()
-//        let storeToLoad = makeSUT()
-//        let feed = uniqueImageFeed()
-//        let timestamp = Date()
-//
-//        insert((feed, timestamp), to: storeToInsert)
-//
-//        expect(storeToLoad, toRetrieve: .found(feed: feed, timestamp: timestamp))
+        let storeToInsert = makeSUT()
+        let storeToLoad = makeSUT()
+        let feed = uniqueImageFeed()
+        let timestamp = Date()
+
+        insert((feed, timestamp), to: storeToInsert)
+
+        expect(storeToLoad, toRetrieve: .found(feed: feed, timestamp: timestamp))
     }
     
     func test_insert_overridesFeedInsertedOnAnotherInstance() {
@@ -83,11 +83,18 @@ class FeedStoreIntegrationTests: XCTestCase {
     }
     
     private func setupEmptyStoreState() {
-
+        deleteArtifacts()
     }
 
     private func undoStoreSideEffects() {
-
+        deleteArtifacts()
+    }
+    
+    private func deleteArtifacts() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.deleteAll()
+        }
     }
     
 }
