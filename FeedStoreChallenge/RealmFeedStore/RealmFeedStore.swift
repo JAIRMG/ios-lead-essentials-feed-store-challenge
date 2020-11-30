@@ -10,12 +10,14 @@ import RealmSwift
 
 public class RealmFeedStore: FeedStore {
     
-    public init() { }
-    
     private static let cacheId = "cache"
+    private let realm: Realm
+    
+    public init(configuration: Realm.Configuration) {
+        realm = try! Realm(configuration: configuration)
+    }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-        let realm = try! Realm()
         
         guard let cache = realm.objects(Cache.self).first else {
             return completion(nil)
@@ -31,7 +33,7 @@ public class RealmFeedStore: FeedStore {
     }
     
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-        let realm = try! Realm()
+        
         let feedList = feed.map(RealmFeedImage.init)
         
         do {
@@ -51,7 +53,7 @@ public class RealmFeedStore: FeedStore {
     }
 
     public func retrieve(completion: @escaping RetrievalCompletion) {
-        let realm = try! Realm()
+
         guard let cache = realm.objects(Cache.self).first else {
             return completion(.empty)
         }
