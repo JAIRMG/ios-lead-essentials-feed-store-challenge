@@ -9,10 +9,10 @@
 import RealmSwift
 
 class RealmFeedImage: Object {
-    @objc dynamic var id = ""
-    @objc dynamic var cacheDescription = ""
-    @objc dynamic var location = ""
-    @objc dynamic var url = ""
+    @objc dynamic var id: String = ""
+    @objc dynamic var cacheDescription: String? = ""
+    @objc dynamic var location: String? = ""
+    @objc dynamic var url: String = ""
 
     override static func primaryKey() -> String? {
       "id"
@@ -20,17 +20,17 @@ class RealmFeedImage: Object {
     
     convenience init(_ image: LocalFeedImage) {
         self.init()
-        self.id = "\(image.id)"
-        self.cacheDescription = image.description ?? ""
-        self.location = image.location ?? ""
-        self.url = "\(url)"
+        self.id = image.id.uuidString
+        self.cacheDescription = image.description
+        self.location = image.location
+        self.url = image.url.absoluteString
     }
     
     var local: LocalFeedImage {
-        .init(id: UUID(uuidString: id) ?? UUID.init(),
+        .init(id: UUID(uuidString: id)!,
               description: cacheDescription,
               location: location,
-              url: URL(string: url) ?? URL(string: "http://any-url.com")!)
+              url: URL(string: url)!)
     }
     
 }
