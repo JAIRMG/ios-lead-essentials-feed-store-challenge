@@ -1,8 +1,4 @@
 //
-//  XCTestCase+FeedStoreHelpers.swift
-//  Tests
-//
-//  Created by Caio Zullo on 01/09/2020.
 //  Copyright © 2020 Essential Developer. All rights reserved.
 //
 

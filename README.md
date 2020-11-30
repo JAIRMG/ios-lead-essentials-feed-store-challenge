@@ -13,7 +13,7 @@ Your custom persistence infrastructure implementation can be backed by any persi
 
 1) Fork the latest version of this repository. Here's <a href="https://guides.github.com/activities/forking" target="_blank">how forking works</a>.
 
-2) Open the `FeedStoreChallenge.xcodeproj` project on Xcode 12.
+2) Open the `FeedStoreChallenge.xcodeproj` project on Xcode 12.2 (you can use other Xcode versions by switching to the appropriate branch, e.g., `xcode11`/`xcode12`).
 
 3) Implement **one** `<FeedStore>` implementation of your choice (CoreData, Realm, InMemory, etc.).
 
