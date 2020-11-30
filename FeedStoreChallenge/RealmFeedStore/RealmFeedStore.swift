@@ -13,8 +13,8 @@ public class RealmFeedStore: FeedStore {
     private static let cacheId = "cache"
     private let realm: Realm
     
-    public init(configuration: Realm.Configuration) {
-        realm = try! Realm(configuration: configuration)
+    public init(configuration: Realm.Configuration) throws {
+        realm = try Realm(configuration: configuration)
     }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
@@ -45,7 +45,6 @@ public class RealmFeedStore: FeedStore {
                 cache.id = RealmFeedStore.cacheId
                 realm.add(cache)
             }
-
             completion(nil)
         } catch {
             completion(error)

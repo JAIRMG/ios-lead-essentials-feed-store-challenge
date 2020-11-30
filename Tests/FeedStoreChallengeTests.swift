@@ -89,12 +89,18 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 
 		assertThatSideEffectsRunSerially(on: sut)
 	}
+    
+    func test_sutCreation_throwErrorWithInvalidURL() throws {
+        var configuration = Realm.Configuration()
+        configuration.fileURL = invalidURL()
+
+        XCTAssertThrowsError(try RealmFeedStore(configuration: configuration))
+    }
 	
 	// - MARK: Helpers
 	
-	private func makeSUT() -> FeedStore {
-        let configuration = Realm.Configuration()
-        let sut = RealmFeedStore(configuration: configuration)
+    private func makeSUT(configuration: Realm.Configuration = Realm.Configuration()) -> FeedStore {
+        let sut = try! RealmFeedStore(configuration: configuration)
         trackForMemoryLeaks(instance: sut)
         return sut
 	}
@@ -119,31 +125,14 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
             XCTAssertNil(instance, "Instance should have been deallocated, potential memory leak", file: file, line: line)
         }
     }
+    
+    private func invalidURL() -> URL {
+        let invalidURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        invalidURL.stopAccessingSecurityScopedResource()
+        return invalidURL
+    }
 }
 
-//  ***********************
-//
-//  Uncomment the following tests if your implementation has failable operations.
-//
-//  Otherwise, delete the commented out code!
-//
-//  ***********************
-
-//extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
-//
-//	func test_retrieve_deliversFailureOnRetrievalError() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
-//	}
-//
-//	func test_retrieve_hasNoSideEffectsOnFailure() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
-//	}
-//
-//}
 
 //extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 //
