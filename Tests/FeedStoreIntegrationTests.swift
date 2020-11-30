@@ -8,6 +8,7 @@
 
 import XCTest
 import FeedStoreChallenge
+import RealmSwift
 
 class FeedStoreIntegrationTests: XCTestCase {
 
@@ -31,9 +32,9 @@ class FeedStoreIntegrationTests: XCTestCase {
     }
     
     func test_retrieve_deliversEmptyOnEmptyCache() {
-//        let sut = makeSUT()
-//
-//        expect(sut, toRetrieve: .empty)
+        let sut = makeSUT()
+
+        expect(sut, toRetrieve: .empty)
     }
 
     func test_retrieve_deliversFeedInsertedOnAnotherInstance() {
@@ -75,8 +76,9 @@ class FeedStoreIntegrationTests: XCTestCase {
     
     // - MARK: Helpers
     
-    private func makeSUT() -> FeedStore {
-        fatalError("Must be implemented")
+    private func makeSUT(configuration: Realm.Configuration = Realm.Configuration()) -> FeedStore {
+        let sut = try! RealmFeedStore(configuration: configuration)
+        return sut
     }
     
     private func setupEmptyStoreState() {
