@@ -26,11 +26,14 @@ class RealmFeedImage: Object {
         self.url = image.url.absoluteString
     }
     
-    var local: LocalFeedImage {
-        .init(id: UUID(uuidString: id)!,
+    var local: LocalFeedImage? {
+		guard let url = URL(string: url), let id = UUID(uuidString: id) else {
+			return nil
+		}
+        return .init(id: id,
               description: cacheDescription,
               location: location,
-              url: URL(string: url)!)
+              url: url)
     }
     
 }

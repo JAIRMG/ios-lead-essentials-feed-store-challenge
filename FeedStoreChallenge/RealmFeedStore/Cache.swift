@@ -18,7 +18,7 @@ class Cache: Object {
     
     
     var localFeed: [LocalFeedImage] {
-        feed.map { $0.local }
+        feed.compactMap { $0.local }
     }
     
 }
