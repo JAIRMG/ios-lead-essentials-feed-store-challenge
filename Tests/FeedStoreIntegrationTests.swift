@@ -65,11 +65,17 @@ class FeedStoreIntegrationTests: XCTestCase {
     
     // - MARK: Helpers
     
-    private func makeSUT(configuration: Realm.Configuration = Realm.Configuration()) -> FeedStore {
-        let sut = try! RealmFeedStore(configuration: configuration)
+    private func makeSUT() -> FeedStore {
+        let sut = try! RealmFeedStore(configuration: inMemoryConfigurationRealm())
         trackForMemoryLeaks(instance: sut)
         return sut
     }
+	
+	private func inMemoryConfigurationRealm() -> Realm.Configuration {
+		var config = Realm.Configuration()
+		config.inMemoryIdentifier = self.name
+		return config
+	}
     
     private func setupEmptyStoreState() {
         deleteArtifacts()

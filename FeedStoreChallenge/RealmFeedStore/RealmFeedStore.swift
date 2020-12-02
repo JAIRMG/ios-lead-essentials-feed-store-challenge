@@ -11,53 +11,74 @@ import RealmSwift
 public class RealmFeedStore: FeedStore {
     
     private static let cacheId = "cache"
-    private let realm: Realm
+	private let configuration: Realm.Configuration
+	
+	private let queue = DispatchQueue(label: "\(RealmFeedStore.self)Queue", qos: .userInitiated, attributes: .concurrent)
     
     public init(configuration: Realm.Configuration) throws {
-        realm = try Realm(configuration: configuration)
+		self.configuration = configuration
     }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-        
-        guard let cache = realm.objects(Cache.self).first else {
-            return completion(nil)
-        }
-        do {
-            try realm.write {
-                realm.delete(cache)
-            }
-            completion(nil)
-        } catch {
-            completion(error)
-        }
+		queue.async(flags: .barrier) {
+			
+			do {
+				let realm = try Realm()
+				
+				guard let cache = realm.objects(Cache.self).first else {
+					return completion(nil)
+				}
+				
+				try realm.write {
+					realm.delete(cache)
+				}
+				completion(nil)
+			} catch {
+				completion(error)
+			}
+			
+		}
     }
     
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         
-        let feedList = feed.map(RealmFeedImage.init)
-        
-        do {
-            try realm.write {
-                realm.deleteAll()
-                let cache = Cache()
-                cache.feed.append(objectsIn: feedList)
-                cache.timestamp = timestamp
-                cache.id = RealmFeedStore.cacheId
-                realm.add(cache)
-            }
-            completion(nil)
-        } catch {
-            completion(error)
-        }
+		queue.async(flags: .barrier) {
+			let feedList = feed.map(RealmFeedImage.init)
+			
+			do {
+				let realm = try Realm()
+				try realm.write {
+					realm.deleteAll()
+					let cache = Cache()
+					cache.feed.append(objectsIn: feedList)
+					cache.timestamp = timestamp
+					cache.id = RealmFeedStore.cacheId
+					realm.add(cache)
+				}
+				completion(nil)
+			} catch {
+				completion(error)
+			}
+			
+		}
+
     }
 
     public func retrieve(completion: @escaping RetrievalCompletion) {
-
-        guard let cache = realm.objects(Cache.self).first else {
-            return completion(.empty)
-        }
-        
-        completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+		queue.async {
+			
+			do {
+				let realm = try Realm()
+				guard let cache = realm.objects(Cache.self).first else {
+					return completion(.empty)
+				}
+				
+				completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+			} catch {
+				completion(.failure(error))
+			}
+			
+		}
     }
     
     

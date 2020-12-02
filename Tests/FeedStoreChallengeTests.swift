@@ -90,19 +90,18 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 		assertThatSideEffectsRunSerially(on: sut)
 	}
     
-    func test_sutCreation_throwErrorWithInvalidURL() {
-        var configuration = Realm.Configuration()
-        configuration.fileURL = invalidURL()
-
-        XCTAssertThrowsError(try RealmFeedStore(configuration: configuration))
-    }
-	
 	// - MARK: Helpers
 	
-    private func makeSUT(configuration: Realm.Configuration = Realm.Configuration()) -> FeedStore {
-        let sut = try! RealmFeedStore(configuration: configuration)
+    private func makeSUT() -> FeedStore {
+        let sut = try! RealmFeedStore(configuration: inMemoryConfigurationRealm())
         trackForMemoryLeaks(instance: sut)
         return sut
+	}
+	
+	private func inMemoryConfigurationRealm() -> Realm.Configuration {
+		var config = Realm.Configuration()
+		config.inMemoryIdentifier = self.name
+		return config
 	}
 	
     private func undoStoreFeedSideEffects() {
