@@ -66,14 +66,13 @@ class FeedStoreIntegrationTests: XCTestCase {
     // - MARK: Helpers
     
     private func makeSUT() -> FeedStore {
-        let sut = RealmFeedStore(configuration: inMemoryConfigurationRealm())
+        let sut = RealmFeedStore(configuration: defaultConfigurationRealm())
         trackForMemoryLeaks(instance: sut)
         return sut
     }
 	
-	private func inMemoryConfigurationRealm() -> Realm.Configuration {
-		var config = Realm.Configuration()
-		config.inMemoryIdentifier = self.name
+	private func defaultConfigurationRealm() -> Realm.Configuration {
+		let config = Realm.Configuration()
 		return config
 	}
     
