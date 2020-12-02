@@ -66,7 +66,7 @@ class FeedStoreIntegrationTests: XCTestCase {
     // - MARK: Helpers
     
     private func makeSUT() -> FeedStore {
-        let sut = try! RealmFeedStore(configuration: inMemoryConfigurationRealm())
+        let sut = RealmFeedStore(configuration: inMemoryConfigurationRealm())
         trackForMemoryLeaks(instance: sut)
         return sut
     }

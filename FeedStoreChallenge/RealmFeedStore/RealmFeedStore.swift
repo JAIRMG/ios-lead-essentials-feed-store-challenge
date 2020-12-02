@@ -15,7 +15,7 @@ public class RealmFeedStore: FeedStore {
 	
 	private let queue = DispatchQueue(label: "\(RealmFeedStore.self)Queue", qos: .userInitiated, attributes: .concurrent)
     
-    public init(configuration: Realm.Configuration) throws {
+    public init(configuration: Realm.Configuration) {
 		self.configuration = configuration
     }
     
